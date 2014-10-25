@@ -1,11 +1,13 @@
-#×Ô¶¯»ú×´Ì¬Àà
+#coding=gbk
+
+#è‡ªåŠ¨æœºçŠ¶æ€ç±»
 class State:
-    #NFA×´Ì¬id=int, DFA×´Ì¬id=set
+    #NFAçŠ¶æ€id=int, DFAçŠ¶æ€id=set
     def __init__(self, id):
         self.id = id
         self.convert = dict()
 
-#ÕıÔò±í´ïÊ½×ª»¯Îª×Ô¶¯»ú
+#æ­£åˆ™è¡¨è¾¾å¼è½¬åŒ–ä¸ºè‡ªåŠ¨æœº
 class Re2DFA:
     def __init__(self):
         self.state_store = dict()
@@ -23,7 +25,7 @@ class Re2DFA:
             self.state_store[id] = State(id)
         return self.state_store[id]
 
-    #½âÎöÕıÔò±í´ïÊ½
+    #è§£ææ­£åˆ™è¡¨è¾¾å¼
     def parse(self, p):
         while p != '':
             if len(p) >= 2 and p[1] == '*':
@@ -33,7 +35,7 @@ class Re2DFA:
                 yield p[0], False
                 p = p[1:]
 
-    #»ñµÃ³õÊ¼µÄNFA
+    #è·å¾—åˆå§‹çš„NFA
     def getNFA(self, p):
         self.state_store.clear()
         self.final_state_id = None
@@ -58,7 +60,7 @@ class Re2DFA:
             tail.convert[last_input] = tail = self.getState(tail.id + 1)
         self.final_state_id = tail.id
 
-    #ÇóÒ»×éset¶ÔÓ¦µÄempty±Õ°ü
+    #æ±‚ä¸€ç»„setå¯¹åº”çš„emptyé—­åŒ…
     def empty_closure(self, source_set):
         target_set = set()
         for id in source_set:
@@ -68,7 +70,7 @@ class Re2DFA:
                 state = state.convert.get('')
         return frozenset(target_set)
 
-    #ÇóÒ»×éset¶ÔÓ¦µÄinput±Õ°ü
+    #æ±‚ä¸€ç»„setå¯¹åº”çš„inputé—­åŒ…
     def input_closure(self, source_set, input):
         target_set = set()
         for id in source_set:
@@ -79,7 +81,7 @@ class Re2DFA:
                 target_set.add(state.convert['.'].id)
         return self.empty_closure(target_set) #frozenset
 
-    #ÇóÊäÈë¼¯ºÏ
+    #æ±‚è¾“å…¥é›†åˆ
     def getInput(self, source_set):
         input_set = set()
         for id in source_set:
@@ -87,7 +89,7 @@ class Re2DFA:
         input_set -= set([''])
         return frozenset(input_set)
 
-    #empty-NFA×ª»¯ÎªDFA
+    #empty-NFAè½¬åŒ–ä¸ºDFA
     def compile(self, p):
         self.getNFA(p)
         if len(self.state_store) == 0:
@@ -105,7 +107,7 @@ class Re2DFA:
                     state.convert[input] = self.getState(extend_set)
                     queue.append(state.convert[input])
 
-    #matchÊäÈë×Ö·û´®
+    #matchè¾“å…¥å­—ç¬¦ä¸²
     def match(self, s):
         if len(self.state_store) == 0:
             return s == ''
