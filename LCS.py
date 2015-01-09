@@ -1,5 +1,5 @@
 ###
-from itertools import groupby
+from itertools import *
 
 class ArrayIter:
     def __init__(self, L, begin):
@@ -40,7 +40,7 @@ def LCS(A, B):
 
 @collect(max, 0)
 def LCS_align(A, B):
-    for key, group in groupby(zip(A, B), lambda (a, b) : a == b):
+    for key, group in groupby(izip(A, B), lambda (a, b) : a == b):
         if key:
             yield sum(1 for tup in group)
 
