@@ -1,6 +1,6 @@
 class ListNode:
     def __init__(self, value):
-        self.value = value
+        self.key = value
         self.pre = None
         self.next = None
 
@@ -52,28 +52,74 @@ class LRUCache:
         self.double_list = DoubleList()
 
     # @return an integer
-    def get(self, key):
+    def __get__(self, key):
         if key not in self.value_map:
-            return -1
+            return None
         
         value, node = self.value_map[key]
         self.double_list.update(node)
         return value
         
-
     # @param key, an integer
     # @param value, an integer
     # @return nothing
-    def set(self, key, value):
+    def __set__(self, key, value):
         if key in self.value_map:
             self.value_map[key][0] = value
             self.double_list.update(self.value_map[key][1])
             return
         
         if len(self.value_map) == self.capacity:
-            pop_key = self.double_list.pop().value
-            self.value_map.pop(pop_key)
+            del_key = self.double_list.pop().key
+            del value_map[del_key]
 
         node = ListNode(key)
         self.value_map[key] = [value, node]
         self.double_list.insert(node)
+        
+    def __delitem__(self, key):
+        self.double_list.remove(value_map[key])
+        del self.value_map[key]
+        
+class DoubleLRUCache:
+    # @param capacity, an integer
+    def __init__(self, capacity):
+        self.cache1 = LRUCache(capacity)
+        self.cache2 = LRUCache(capacity)
+
+    # @return an integer
+    def __get__(self, key):
+        v1 = self.cache1[key]
+        if v1:
+            return v1
+        v2 = self.cache2[key]
+        if v2:
+            del self.cache2[key]
+            self.cache1[key] = v2            
+            return v2
+        return None
+
+    def __set__(self, key, value):
+        v1 = self.cahce1[key]
+        if v1:
+            self.cahce1[key] = value
+            return
+        v2 = self.cache2[key]
+        if v2:
+            del self.cache2[key]
+            self.cache1[key] = value
+            return
+        self.cahce2[key] = value
+        
+
+from functools import wraps
+def memo(fn):
+    @wraps(fn)
+    def wrapper(*args):
+        result = wrapper.cache[args]
+        if result is None:
+            result = fn(*args)
+            wrapper.cache[args] = result
+        return result
+    wrapper.cache = DoubleLRUCache(1000)
+    return wrapper
