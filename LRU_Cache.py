@@ -110,7 +110,37 @@ class DoubleLRUCache:
             self.cache1[key] = value
             return
         self.cahce2[key] = value
-        
+
+class MultiLRUCache:
+    # @param capacity, an integer
+    def __init__(self, n, capacity):
+        self.caches = [LRUCache(capacity) for i in range(n)]
+
+    # @return an integer
+    def __get__(self, key):
+        for i in range(len(self.caches)):
+            v = self.caches[i][key]
+            if v:
+                if i == 0:
+                    return v
+                else:
+                    del self.caches[i][key]
+                    self.caches[i - 1][key] = v
+                    return v
+        return None
+
+    def __set__(self, key, value):
+        for i in range(len(self.caches)):
+            v = self.caches[i][key]
+            if v:
+                if i == 0:
+                    self.caches[i][key] = value
+                    return 
+                else:
+                    del self.caches[i][key]
+                    self.caches[i-1][key] = value
+                    return
+        self.cahces[-1][key] = value
 
 from functools import wraps
 def memo(fn):
